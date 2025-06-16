@@ -16,7 +16,7 @@
     "appId": "com.proxy.app",
     "productName": "Custom Header Proxy",
     "files": [
-      "build/**/*",
+      "release/build/**/*",
       "electron/**/*",
       "node_modules/**/*"
     ],
