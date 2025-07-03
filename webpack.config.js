@@ -2,8 +2,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/index.js', 
-     output: {
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  entry: './src/index.js',
+  output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
     publicPath: './'
@@ -28,20 +29,22 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.jsx']
-  }, 
-   plugins: [
+  },   plugins: [
     new HtmlWebpackPlugin({
-      template: './build/index.html',
+      template: './public/index.html',
       filename: 'index.html',
       inject: true,
-      publicPath: '/'
+      publicPath: './'
     })
-  ],
-  devServer: {
+  ],  devServer: {
     static: {
       directory: path.join(__dirname, 'public')
     },
     port: 3000,
-    hot: true
+    hot: true,
+    historyApiFallback: true,
+    devMiddleware: {
+      publicPath: '/'
+    }
   }
 };

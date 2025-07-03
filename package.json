@@ -2,15 +2,16 @@
   "name": "proxy-app",
   "version": "1.0.0",
   "description": "Proxy application with custom headers",
-  "main": "electron/main.js",  
+  "main": "electron/main.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production npm run react-build && electron .",
-    "dev": "concurrently \"cross-env BROWSER=none NODE_ENV=development npm run react-start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
+    "clean": "rimraf build",
+    "start": "cross-env NODE_ENV=production npm run clean && npm run react-build && electron .",
+    "dev": "cross-env NODE_ENV=development npm run clean && concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "react-start": "webpack serve --mode development",
     "react-build": "webpack --mode production",
-    "build": "npm run react-build && electron-builder build --win --mac",
-    "build:win": "npm run react-build && electron-builder build --win",
-    "build:mac": "npm run react-build && electron-builder build --mac"
+    "build": "npm run clean && npm run react-build && electron-builder build --win --mac",
+    "build:win": "npm run clean && npm run react-build && electron-builder build --win",
+    "build:mac": "npm run clean && npm run react-build && electron-builder build --mac"
   },
   "build": {
     "appId": "com.proxy.app",
@@ -40,13 +41,13 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "electron-is-dev": "^3.0.1",
     "express": "^5.1.0",
     "find-process": "^1.4.10",
     "http-proxy-middleware": "^3.0.5",
     "ip": "^2.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "electron-is-dev": "^3.0.1",
     "tcp-port-used": "^1.0.2"
   },
   "devDependencies": {
@@ -54,12 +55,13 @@
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
     "babel-loader": "^10.0.0",
-    "electron": "^36.4.0",
-    "electron-builder": "^26.0.12",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
+    "electron": "^36.4.0",
+    "electron-builder": "^26.0.12",
     "html-webpack-plugin": "^5.6.3",
+    "rimraf": "^6.0.1",
     "style-loader": "^4.0.0",
     "wait-on": "^8.0.3",
     "webpack": "^5.99.9",
