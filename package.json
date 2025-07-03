@@ -2,10 +2,10 @@
   "name": "proxy-app",
   "version": "1.0.0",
   "description": "Proxy application with custom headers",
-  "main": "electron/main.js",
+  "main": "electron/main.js",  
   "scripts": {
-    "start": "electron .",
-    "dev": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "cross-env NODE_ENV=production npm run react-build && electron .",
+    "dev": "concurrently \"cross-env BROWSER=none NODE_ENV=development npm run react-start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "react-start": "webpack serve --mode development",
     "react-build": "webpack --mode production",
     "build": "npm run react-build && electron-builder build --win --mac",
@@ -16,7 +16,7 @@
     "appId": "com.proxy.app",
     "productName": "Custom Header Proxy",
     "files": [
-      "release/build/**/*",
+      "build/**/*",
       "electron/**/*",
       "node_modules/**/*"
     ],
@@ -46,6 +46,7 @@
     "ip": "^2.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "electron-is-dev": "^3.0.1",
     "tcp-port-used": "^1.0.2"
   },
   "devDependencies": {
@@ -58,7 +59,6 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
-    "electron-is-dev": "^3.0.1",
     "html-webpack-plugin": "^5.6.3",
     "style-loader": "^4.0.0",
     "wait-on": "^8.0.3",

@@ -1,6 +1,5 @@
 const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
 const path = require('path');
-const isDev = require('electron-is-dev');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
@@ -8,6 +7,16 @@ const ip = require('ip');
 const tcpPortUsed = require('tcp-port-used');
 const find = require('find-process');
 const { exec } = require('child_process');
+const url = require('url');
+const fs = require('fs');
+
+// Define isDev to determine if we're in development or production
+const isDev = process.env.NODE_ENV === 'development';
+console.log(`Running in ${isDev ? 'development' : 'production'} mode`);
+
+// Set a custom user data directory to avoid permission issues
+const userDataPath = path.join(app.getPath('appData'), 'custom-header-proxy');
+app.setPath('userData', userDataPath);
 
 let mainWindow;
 let proxyServer;
@@ -24,16 +33,28 @@ function createWindow() {
     },
     resizable: true,
     autoHideMenuBar: true, // Hide the menu bar for a cleaner UI
-  });
+  });  // Load the app
+  const appUrl = isDev
+    ? 'http://localhost:3000'
+    : `file://${path.resolve(__dirname, '../build/index.html')}`;
+    console.log(`Loading app from: ${appUrl}`);
+  mainWindow.loadURL(appUrl);
+  
 
-  // Load the app
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`
-  );
-
-  // Don't open DevTools automatically
+  // Log the path we're trying to load in production
+  if (!isDev) {
+    console.log('Loading file from:', path.join(__dirname, '../build/index.html'));
+    // Check if the file exists
+    try {
+      if (fs.existsSync(path.join(__dirname, '../build/index.html'))) {
+        console.log('File exists and is accessible');
+      } else {
+        console.error('Error: build/index.html does not exist. Run npm run react-build first.');
+      }
+    } catch (err) {
+      console.error('Error checking file:', err);
+    }
+  }
   
   mainWindow.on('closed', () => (mainWindow = null));
   
