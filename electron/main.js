@@ -33,11 +33,52 @@ function createWindow() {
     },
     resizable: true,
     autoHideMenuBar: true, // Hide the menu bar for a cleaner UI
-  });  // Load the app
-  const appUrl = isDev
-    ? 'http://localhost:3000'
-    : `file://${path.resolve(__dirname, '../build/index.html')}`;
-    console.log(`Loading app from: ${appUrl}`);
+  });
+
+  // Load the app
+  let appUrl;
+  if (isDev) {
+    appUrl = 'http://localhost:3000';
+  } else {
+    // Get the correct path for production build
+    const indexPath = path.join(__dirname, '../build/index.html');
+    const appPath = path.join(process.resourcesPath, 'build/index.html');
+    
+    // Try to find the index.html file in different possible locations
+    let finalPath;
+    if (fs.existsSync(indexPath)) {
+      finalPath = indexPath;
+      console.log('Found index.html in build folder');
+    } else if (fs.existsSync(appPath)) {
+      finalPath = appPath;
+      console.log('Found index.html in resources/build folder');
+    } else {
+      // Last resort - try to find it relative to the app location
+      const possiblePaths = [
+        path.join(app.getAppPath(), 'build/index.html'),
+        path.join(path.dirname(app.getAppPath()), 'build/index.html'),
+        path.join(app.getPath('exe'), '../build/index.html')
+      ];
+      
+      for (const p of possiblePaths) {
+        console.log('Checking path:', p);
+        if (fs.existsSync(p)) {
+          finalPath = p;
+          console.log('Found index.html at:', p);
+          break;
+        }
+      }
+      
+      if (!finalPath) {
+        finalPath = indexPath; // Fallback to original path
+        console.warn('Could not find index.html, falling back to:', finalPath);
+      }
+    }
+    
+    appUrl = `file://${finalPath}`;
+  }
+  
+  console.log(`Loading app from: ${appUrl}`);
   mainWindow.loadURL(appUrl);
   
 
